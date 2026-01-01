@@ -27,6 +27,22 @@
         }
         h3 {
             margin: 0 0 10px 0;
+            position: relative;
+        }
+        .info-icon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+        }
+        .info-panel {
+            display: none;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 12px;
+            line-height: 1.4;
         }
         .status {
             margin-bottom: 10px;
@@ -53,13 +69,24 @@
             background: #f9f9f9;
             min-height: 60px;
         }
-        .reset-btn {
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .reset-btn, .toggle-btn {
             padding: 10px 20px;
             cursor: pointer;
-            background: #ffcccc;
             border: 1px solid #333;
             border-radius: 5px;
             font-size: 16px;
+        }
+        .reset-btn {
+            background: #ffcccc;
+        }
+        .toggle-btn {
+            background: #e0e0e0;
         }
         @media (max-width: 480px) {
             .game-container {
@@ -70,7 +97,7 @@
                 font-size: 20px;
                 min-height: 50px;
             }
-            .reset-btn {
+            .reset-btn, .toggle-btn {
                 padding: 8px 16px;
                 font-size: 14px;
             }
@@ -79,10 +106,21 @@
 </head>
 <body>
     <div class="game-container">
-        <h3>Infinite Tic-Tac-Toe</h3>
+        <h3>Infinite Tic-Tac-Toe<span class="info-icon">ℹ</span></h3>
         <div class="status">Player X's turn</div>
+        <div class="info-panel">
+            <strong>How to Play:</strong><br>
+            • Players take turns placing X and O<br>
+            • Get 3 in a row to win<br>
+            • After 3 pieces, oldest/random piece disappears<br><br>
+            <strong>Oldest Mode:</strong> First piece placed disappears<br>
+            <strong>Random Mode:</strong> Random piece disappears (shown ghostly)
+        </div>
         <div class="board"></div>
-        <button class="reset-btn">Reset Game</button>
+        <div class="button-container">
+            <button class="reset-btn">Reset Game</button>
+            <button class="toggle-btn">Mode: Oldest</button>
+        </div>
     </div>
 
     <script>
@@ -90,10 +128,16 @@
         let moveHistory = [];
         let currentPlayer = 'X';
         let gameActive = true;
+        let randomMode = false;
+        let markedForRemoval = { X: null, O: null };
+        let showInfo = false;
 
         const status = document.querySelector('.status');
         const boardElement = document.querySelector('.board');
         const resetBtn = document.querySelector('.reset-btn');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const infoIcon = document.querySelector('.info-icon');
+        const infoPanel = document.querySelector('.info-panel');
 
         const cells = [];
         for (let i = 0; i < 9; i++) {
@@ -110,13 +154,25 @@
             const currentPlayerMoves = moveHistory.filter(m => m.player === currentPlayer);
 
             if (currentPlayerMoves.length >= 3) {
-                const oldestMove = currentPlayerMoves[0];
-                board[oldestMove.row][oldestMove.col] = null;
-                moveHistory.splice(moveHistory.indexOf(oldestMove), 1);
+                const moveToRemove = randomMode ? 
+                    markedForRemoval[currentPlayer] || currentPlayerMoves[Math.floor(Math.random() * currentPlayerMoves.length)] :
+                    currentPlayerMoves[0];
+                board[moveToRemove.row][moveToRemove.col] = null;
+                moveHistory.splice(moveHistory.indexOf(moveToRemove), 1);
+                markedForRemoval[currentPlayer] = null;
             }
 
             board[row][col] = currentPlayer;
             moveHistory.push({ player: currentPlayer, row, col });
+
+            // Mark random piece for removal when player has 3 pieces in random mode
+            if (randomMode) {
+                const otherPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                const otherPlayerMoves = moveHistory.filter(m => m.player === otherPlayer);
+                if (otherPlayerMoves.length >= 3 && !markedForRemoval[otherPlayer]) {
+                    markedForRemoval[otherPlayer] = otherPlayerMoves[Math.floor(Math.random() * otherPlayerMoves.length)];
+                }
+            }
 
             if (checkForWin(currentPlayer)) {
                 status.textContent = `🎉 Player ${currentPlayer} wins! 🎉`;
@@ -163,11 +219,11 @@
                 
                 if (cell.style.background !== 'rgb(255, 215, 0)') {
                     if (player === 'X') {
-                        cell.style.background = '#cce7ff';
-                        cell.style.color = '#003d7a';
+                        cell.style.background = randomMode ? '#ccffcc' : '#cce7ff';
+                        cell.style.color = randomMode ? '#006600' : '#003d7a';
                     } else if (player === 'O') {
-                        cell.style.background = '#ffcccc';
-                        cell.style.color = '#cc0000';
+                        cell.style.background = randomMode ? '#e6ccff' : '#ffcccc';
+                        cell.style.color = randomMode ? '#6600cc' : '#cc0000';
                     } else {
                         cell.style.background = '#f9f9f9';
                         cell.style.color = '#000';
@@ -175,12 +231,19 @@
                 }
                 
                 if (gameActive) {
-                    const playerMoves = moveHistory.filter(m => m.player === player);
-                    if (playerMoves.length >= 3 && playerMoves[0].row === row && playerMoves[0].col === col) {
-                        cell.style.opacity = '0.4';
-                    } else {
-                        cell.style.opacity = '1';
-                    }
+                    const isMarkedForRemoval = randomMode && 
+                        markedForRemoval[player] && 
+                        markedForRemoval[player].row === row && 
+                        markedForRemoval[player].col === col;
+                    
+                    const isOldest = !randomMode && player && 
+                        moveHistory.filter(m => m.player === player).length >= 3 &&
+                        moveHistory.filter(m => m.player === player)[0].row === row &&
+                        moveHistory.filter(m => m.player === player)[0].col === col;
+                    
+                    cell.style.opacity = (isMarkedForRemoval || isOldest) ? '0.4' : '1';
+                } else {
+                    cell.style.opacity = '1';
                 }
             });
         }
@@ -190,6 +253,7 @@
             moveHistory = [];
             currentPlayer = 'X';
             gameActive = true;
+            markedForRemoval = { X: null, O: null };
             status.textContent = "Player X's turn";
             resetBtn.style.background = '#ffcccc';
             
@@ -203,6 +267,29 @@
         }
 
         resetBtn.addEventListener('click', resetGame);
+        toggleBtn.addEventListener('click', () => {
+            randomMode = !randomMode;
+            toggleBtn.textContent = randomMode ? 'Mode: Random' : 'Mode: Oldest';
+            markedForRemoval = { X: null, O: null };
+            
+            // Mark pieces for removal in random mode
+            if (randomMode) {
+                ['X', 'O'].forEach(player => {
+                    const playerMoves = moveHistory.filter(m => m.player === player);
+                    if (playerMoves.length >= 3) {
+                        markedForRemoval[player] = playerMoves[Math.floor(Math.random() * playerMoves.length)];
+                    }
+                });
+            }
+            
+            updateBoard();
+        });
+        infoIcon.addEventListener('click', () => {
+            showInfo = !showInfo;
+            infoIcon.textContent = showInfo ? '❌' : 'ℹ';
+            infoPanel.style.display = showInfo ? 'block' : 'none';
+            boardElement.style.display = showInfo ? 'none' : 'grid';
+        });
         updateBoard();
     </script>
 </body>
