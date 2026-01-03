@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinite Tic-Tac-Toe</title>
+    <title>Infinit Cube Tic-Tac-Toe</title>
     <style>
+    
         body {
             margin: 0;
             padding: 20px;
@@ -42,13 +43,17 @@
             margin-bottom: 10px;
             text-align: left;
             font-size: 12px;
-            line-height: 1.4;
+            line-height: 1.2;
+            padding: 8px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         .status {
             margin-bottom: 10px;
             font-weight: bold;
         }
-        .board {
+        #board_front, #board_right, #board_top, #board_bottom, #board_left, #board_back, #flatBoard {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 2px;
@@ -71,21 +76,23 @@
         }
         .button-container {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             justify-content: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
-        .reset-btn, .toggle-btn {
-            padding: 10px 20px;
+        .reset-btn, .toggle-btn, .game-mode-btn {
+            padding: 8px 12px;
             cursor: pointer;
             border: 1px solid #333;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 0;
         }
         .reset-btn {
             background: #ffcccc;
         }
-        .toggle-btn {
+        .toggle-btn, .game-mode-btn {
             background: #e0e0e0;
         }
         @media (max-width: 480px) {
@@ -103,90 +110,590 @@
             }
         }
     </style>
+      <style id="INLINE_PEN_STYLESHEET_ID">
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container .cube-container {
+  perspective: 800px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.container .cube-container .cube {
+  transition: transform 1s ease-in-out;
+  transform-style: preserve-3d;
+  width: 200px;
+  height: 200px;
+  margin: 50px 0;
+}
+
+.container .cube-container .cube.cube1 {
+  /* Remove animation - cube stays stationary */
+}
+
+.container .cube-container .cube.cube2 {
+  animation: vertical-spin 5s infinite linear;
+}
+
+.container .cube-container .cube .box {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: "Roboto", sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container .cube-container .cube .box.front {
+  transform: translateZ(100px);
+}
+
+.container .cube-container .cube .box.box2.front {
+  background: #8c31a5;
+}
+
+.container .cube-container .cube .box.back {
+  transform: translateZ(-100px) rotateY(180deg);
+}
+
+.container .cube-container .cube .box.box2.back {
+  background: #8e43a3;
+  transform: translateZ(-75px) rotateX(-180deg);
+}
+
+.container .cube-container .cube .box.top {
+  transform: rotateX(-90deg) translateY(-100px);
+  transform-origin: top center;
+}
+
+.container .cube-container .cube .box.box2.top {
+  background: #ab69bd;
+  transform: rotateX(90deg) translateY(-100px);
+}
+
+.container .cube-container .cube .box.bottom {
+  transform: rotateX(90deg) translateY(100px);
+  transform-origin: bottom center;
+}
+
+.container .cube-container .cube .box.box2.bottom {
+  transform: rotateX(-90deg) translateY(100px);
+}
+
+.container .cube-container .cube .box.left {
+  transform: rotateY(270deg) translateX(-100px);
+  transform-origin: center left;
+}
+
+.container .cube-container .cube .box.box2.left {
+  background: #c060da;
+}
+
+.container .cube-container .cube .box.right {
+  transform: rotateY(-270deg) translateX(100px);
+  transform-origin: top right;
+}
+
+.container .cube-container .cube .box.box2.right {
+  background: #c976e0;
+}
+
+@keyframes horizontal-spin {
+  from {
+    transform: rotateY(0);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+@keyframes vertical-spin {
+  from {
+    transform: rotateX(0);
+  }
+  to {
+    transform: rotateX(360deg);
+  }
+}
+
+.cube-rotate-front { transform: rotateY(0deg) rotateX(0deg); }
+.cube-rotate-right { transform: rotateY(-90deg) rotateX(0deg); }
+.cube-rotate-back { transform: rotateY(-180deg) rotateX(0deg); }
+.cube-rotate-left { transform: rotateY(90deg) rotateX(0deg); }
+.cube-rotate-top { transform: rotateY(0deg) rotateX(90deg); }
+.cube-rotate-bottom { transform: rotateY(0deg) rotateX(-90deg); }
+  </style>
+<script id="fortidlp-file-access-api" src="chrome-extension://gbojkjpincgojijodbnliimgeggnomai/upload_fileaccessapi.js"></script><script id="fortidlp-input-element-creation" src="chrome-extension://gbojkjpincgojijodbnliimgeggnomai/upload_element_creation.js"></script>
+<style id="mjxmzp2g.5">
+        .tm-note-editor, .tm-manager-panel {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            color: #333 !important;
+            box-sizing: border-box;
+            line-height: 1.5;
+            font-size: 14px !important;
+        }
+        .tm-note-editor *, .tm-manager-panel * {
+            color: #333 !important;
+            font-family: inherit !important;
+        }
+        .tm-note-editor .tm-note-header {
+            background-color: transparent !important;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        input, textarea {
+    display: block;
+    background: none;
+    font: inherit;
+}
+        .tm-note-editor .tm-note-title {
+            font-size: 16px !important;
+            font-weight: bold !important;
+            padding: 5px !important;
+            background-color: #fff !important;
+            border: 1px solid #ccc !important;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1) !important;
+            border-radius: 3px !important;
+            cursor: pointer !important;
+            color: #333 !important;
+        }
+        .tm-note-editor .tm-note-content {
+            color: #333 !important;
+            background-color: #f9f9f9 !important;
+        }
+        .tm-note-editor .tm-note-preview {
+            color: #333 !important;
+        }
+        .tm-note-editor .tm-note-title:focus {
+            outline: 2px solid #007cba;
+            cursor: text;
+        }
+        .tm-note-editor .tm-color-picker {
+            cursor: pointer;
+            border: none;
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            background: transparent;
+        }
+        .tm-note-editor .tm-note-content, .tm-note-editor .tm-note-preview {
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            width: 100%;
+            height: calc(100% - 110px);
+            margin-top: 10px;
+            overflow-y: auto;
+        }
+        .tm-note-editor .tm-note-preview {
+            min-height: 50px;
+            word-wrap: break-word;
+        }
+        .tm-note-editor ::-webkit-scrollbar, .tm-manager-panel ::-webkit-scrollbar {
+            width: 8px;
+        }
+        .tm-note-editor ::-webkit-scrollbar-track, .tm-manager-panel ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .tm-note-editor ::-webkit-scrollbar-thumb, .tm-manager-panel ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .tm-note-editor ::-webkit-scrollbar-thumb:hover, .tm-manager-panel ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .tm-manager-panel h4 {
+            font-size: 18px !important;
+            font-weight: bold !important;
+            color: #555 !important;
+            margin: 0 !important;
+        }
+        .tm-note-link, .tm-webpage-link {
+            color: #007cba !important;
+            text-decoration: none !important;
+        }
+        .tm-note-link:hover, .tm-webpage-link:hover {
+            color: #005a8b !important;
+        }
+        .tm-manager-panel button {
+            cursor: pointer !important;
+            border: 1px solid #ccc !important;
+            background-color: #f0f0f0 !important;
+            padding: 5px 10px !important;
+            border-radius: 3px !important;
+            font-family: inherit !important;
+            font-size: 14px !important;
+            color: #333 !important;
+            text-decoration: none !important;
+            outline: none !important;
+        }
+        .tm-manager-panel button:hover {
+            background-color: #e0e0e0 !important;
+        }
+        .tm-note-editor button {
+            cursor: pointer !important;
+            border: 1px solid #ccc !important;
+            background-color: #f0f0f0 !important;
+            padding: 2px 5px !important;
+            border-radius: 3px !important;
+            font-family: inherit !important;
+            font-size: 12px !important;
+            color: #333 !important;
+            text-decoration: none !important;
+            outline: none !important;
+        }
+        .tm-note-editor button:hover {
+            background-color: #e0e0e0 !important;
+        }
+        .md_notes_btn {
+    flex: 1 1 0% !important;
+    padding: 6px 4px !important;
+    font-size: 12px !important;
+    background-color: rgb(240, 240, 240);
+    color: rgb(51, 51, 51);
+}
+        #tm-delete-selected {
+            background-color: #d9534f !important;
+            color: white !important;
+            border-color: #d43f3a !important;
+        }
+        #tm-delete-selected:disabled {
+            background-color: #f0f0f0 !important;
+            color: #ccc !important;
+            border-color: #ccc !important;
+        }
+        #tm-delete-selected:hover:enabled {
+            background-color: #c9302c !important;
+        }
+        #tm-manager-toggle {
+            background: transparent !important;
+            border: none !important;
+            font-size: 1.5em !important;
+            padding: 0 !important;
+        }
+        .tm-manager-panel {
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+        }
+        #tm-notes-list {
+            max-height: 45vh !important;
+            overflow-y: auto !important;
+        }
+        .tm-webpage-group {
+            margin-bottom: 15px !important;
+            border: 1px solid #e0e0e0 !important;
+            border-radius: 5px !important;
+            padding: 10px !important;
+            background: #f9f9f9 !important;
+        }
+        .tm-webpage-title {
+            font-weight: bold !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+            color: #007cba !important;
+            cursor: pointer !important;
+            text-decoration: underline !important;
+            word-break: break-all !important;
+        }
+        .tm-note-item {
+            padding: 5px 0 !important;
+            border-bottom: 1px dashed #ddd !important;
+            cursor: pointer !important;
+            margin-left: 15px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .tm-note-item:hover {
+            background-color: #f0f0f0 !important;
+        }
+        .tm-note-item-content {
+            flex-grow: 1 !important;
+        }
+        .tm-note-item-title {
+            font-weight: bold !important;
+            color: #333 !important;
+            font-size: 13px !important;
+        }
+        .tm-note-item-preview {
+            color: #666 !important;
+            font-size: 11px !important;
+            margin-top: 2px !important;
+            word-break: break-word !important;
+        }
+        .tm-global-note {
+            padding: 8px 0 !important;
+            border-bottom: 1px dashed #ddd !important;
+            cursor: pointer !important;
+            color: #007cba !important;
+        }
+        .tm-global-note:hover {
+            background-color: #f0f0f0 !important;
+        }
+        .tm-status-controls {
+            display: flex !important;
+            gap: 10px !important;
+            margin: 5px 0 !important;
+            padding: 5px !important;
+            background: rgba(255,255,255,0.8) !important;
+            border-radius: 3px !important;
+        }
+        .tm-status-option {
+            display: flex !important;
+            align-items: center !important;
+            gap: 3px !important;
+            font-size: 12px !important;
+        }
+        .tm-status-todo { background-color: #ffcccc !important; }
+        .tm-status-progress { background-color: #ffe6cc !important; }
+        .tm-status-done { background-color: #ccffcc !important; }
+        .tm-status-marker { background-color: #cce6ff !important; }
+        .tm-status-note { background-color: #ffffe0 !important; }
+    </style>
 </head>
 <body>
     <div class="game-container">
-        <h3>Infinite Tic-Tac-Toe<span class="info-icon">ℹ</span></h3>
+        <h3>Infinite Cube Tic-Tac-Toe<span class="info-icon">ℹ</span></h3>
         <div class="status">Player X's turn</div>
         <div class="info-panel">
-            <strong>How to Play:</strong><br>
-            • Players take turns placing X and O<br>
-            • Get 3 in a row to win<br>
-            • After 3 pieces, oldest/random piece disappears<br><br>
-            <strong>Oldest Mode:</strong> First piece placed disappears<br>
-            <strong>Random Mode:</strong> Random piece disappears (shown ghostly)
+            <strong>How to Play:</strong> Players take turns placing X and O. Get 3 in a row to win. After 3 pieces, oldest/random piece disappears.<br><br>
+            <strong>Game Modes:</strong><br>
+            • <strong>Cube Mode:</strong> Play on 6 rotating faces<br>
+            &nbsp;&nbsp;→ Cube rotates after 2 moves or face win<br>
+            &nbsp;&nbsp;→ Most face wins determines winner<br>
+            • <strong>Flat Mode:</strong> Single board infinite game<br><br>
+            <strong>Piece Removal:</strong><br>
+            • Oldest Mode: First piece placed disappears<br>
+            • Random Mode: Random piece disappears (shown ghostly)
         </div>
-        <div class="board"></div>
+        <div class="container" id="cubeContainer">
+  <div class="cube-container">
+    <div class="cube cube1" id="gameCube">
+      <div class="box box1 front" id="board_front"></div>
+      <div class="box box1 right" id="board_right"></div>
+      <div class="box box1 top" id="board_top"></div>
+      <div class="box box1 bottom" id="board_bottom"></div>
+      <div class="box box1 left" id="board_left"></div>
+      <div class="box box1 back" id="board_back"></div>
+    </div>
+  </div>
+</div>
+        <div id="flatBoard" style="display: none;"></div>
         <div class="button-container">
             <button class="reset-btn">Reset Game</button>
             <button class="toggle-btn">Mode: Oldest</button>
+            <button class="game-mode-btn">Mode: Cube</button>
         </div>
     </div>
 
     <script>
-        let board = [[null, null, null], [null, null, null], [null, null, null]];
-        let moveHistory = [];
-        let currentPlayer = 'X';
-        let gameActive = true;
+        const faces = ['front', 'right', 'top', 'bottom', 'left', 'back'];
+        let boards = {};
+        let moveHistories = {};
+        let currentPlayers = {};
+        let markedForRemovals = {};
         let randomMode = false;
-        let markedForRemoval = { X: null, O: null };
-        let showInfo = false;
+        let currentFace = 'front';
+        let moveCount = 0;
+        let faceStatus = {front: false, right: false, top: false, bottom: false, left: false, back: false};
+        let faceWins = {front: null, right: null, top: null, bottom: null, left: null, back: null};
+        let boardLocked = false;
+        let gameStarted = false;
+        let movesThisRound = 0;
+        let wonFaces = new Set();
+        let isCubeMode = true;
 
         const status = document.querySelector('.status');
-        const boardElement = document.querySelector('.board');
         const resetBtn = document.querySelector('.reset-btn');
         const toggleBtn = document.querySelector('.toggle-btn');
+        const gameModeBtn = document.querySelector('.game-mode-btn');
         const infoIcon = document.querySelector('.info-icon');
         const infoPanel = document.querySelector('.info-panel');
+        const cube = document.getElementById('gameCube');
+        const cubeContainer = document.getElementById('cubeContainer');
+        const flatBoard = document.getElementById('flatBoard');
 
-        const cells = [];
+        let showInfo = false;
+        let allCells = {};
+        let flatCells = [];
+
+        // Initialize all boards
+        faces.forEach(face => {
+            boards[face] = [[null, null, null], [null, null, null], [null, null, null]];
+            moveHistories[face] = [];
+            currentPlayers[face] = 'X';
+            markedForRemovals[face] = { X: null, O: null };
+            
+            const boardElement = document.querySelector(`#board_${face}`);
+            allCells[face] = [];
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.addEventListener('click', () => handleMove(face, Math.floor(i / 3), i % 3));
+                allCells[face].push(cell);
+                boardElement.appendChild(cell);
+            }
+        });
+
+        // Initialize flat board
         for (let i = 0; i < 9; i++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
-            cell.addEventListener('click', () => handleMove(Math.floor(i / 3), i % 3));
-            cells.push(cell);
-            boardElement.appendChild(cell);
+            cell.addEventListener('click', () => handleMove('front', Math.floor(i / 3), i % 3));
+            flatCells.push(cell);
+            flatBoard.appendChild(cell);
         }
 
-        function handleMove(row, col) {
-            if (!gameActive || board[row][col] !== null) return;
+        function rotateCube() {
+            // Get faces that haven't been won yet
+            const availableFaces = faces.filter(face => faceWins[face] === null);
+            
+            if (availableFaces.length <= 1) {
+                // Stay on current face if it's the last one
+                movesThisRound = 0; // Reset moves for continued play
+                return;
+            }
+            
+            // Exclude current face unless it's the only option
+            const rotationOptions = availableFaces.filter(face => face !== currentFace);
+            if (rotationOptions.length === 0) return;
+            
+            currentFace = rotationOptions[Math.floor(Math.random() * rotationOptions.length)];
+            cube.className = `cube cube1 cube-rotate-${currentFace}`;
+            movesThisRound = 0; // Reset move count after rotation
+        }
 
-            const currentPlayerMoves = moveHistory.filter(m => m.player === currentPlayer);
+        function getVisibleFace() {
+            const cubeClasses = cube.className;
+            if (cubeClasses.includes('cube-rotate-front')) return 'front';
+            if (cubeClasses.includes('cube-rotate-right')) return 'right';
+            if (cubeClasses.includes('cube-rotate-back')) return 'back';
+            if (cubeClasses.includes('cube-rotate-left')) return 'left';
+            if (cubeClasses.includes('cube-rotate-top')) return 'top';
+            if (cubeClasses.includes('cube-rotate-bottom')) return 'bottom';
+            return 'front'; // default
+        }
+
+        function waitForRotationComplete(targetFace, callback) {
+            const checkRotation = () => {
+                const visibleFace = getVisibleFace();
+                console.log(`Checking rotation: target=${targetFace}, visible=${visibleFace}`);
+                
+                if (visibleFace === targetFace) {
+                    console.log(`Rotation complete to ${targetFace}`);
+                    callback();
+                } else {
+                    setTimeout(checkRotation, 100); // Check every 100ms
+                }
+            };
+            checkRotation();
+        }
+
+        function handleMove(face, row, col) {
+            if (!isCubeMode) face = 'front'; // In flat mode, always use front face
+            
+            console.log(`=== MOVE ATTEMPT ===`);
+            console.log(`Face clicked: ${face}`);
+            console.log(`Current face: ${currentFace}`);
+            console.log(`Cube mode: ${isCubeMode}`);
+            console.log(`Locked: ${boardLocked}`);
+            console.log(`MoveCount: ${moveCount}`);
+            
+            if (boardLocked || faceStatus[face] || boards[face][row][col] !== null) {
+                console.log(`MOVE BLOCKED - Locked:${boardLocked}, Won:${faceStatus[face]}, CellTaken:${boards[face][row][col] !== null}`);
+                return;
+            }
+
+            if (isCubeMode) {
+                currentFace = face;
+                console.log(`Updated current face to: ${currentFace}`);
+            }
+
+            console.log(`MOVE ALLOWED - Player ${currentPlayers[face]} moving`);
+
+            gameStarted = true;
+            const currentPlayerMoves = moveHistories[face].filter(m => m.player === currentPlayers[face]);
 
             if (currentPlayerMoves.length >= 3) {
                 const moveToRemove = randomMode ? 
-                    markedForRemoval[currentPlayer] || currentPlayerMoves[Math.floor(Math.random() * currentPlayerMoves.length)] :
+                    markedForRemovals[face][currentPlayers[face]] || currentPlayerMoves[Math.floor(Math.random() * currentPlayerMoves.length)] :
                     currentPlayerMoves[0];
-                board[moveToRemove.row][moveToRemove.col] = null;
-                moveHistory.splice(moveHistory.indexOf(moveToRemove), 1);
-                markedForRemoval[currentPlayer] = null;
+                boards[face][moveToRemove.row][moveToRemove.col] = null;
+                moveHistories[face].splice(moveHistories[face].indexOf(moveToRemove), 1);
+                markedForRemovals[face][currentPlayers[face]] = null;
             }
 
-            board[row][col] = currentPlayer;
-            moveHistory.push({ player: currentPlayer, row, col });
+            boards[face][row][col] = currentPlayers[face];
+            moveHistories[face].push({ player: currentPlayers[face], row, col });
 
-            // Mark random piece for removal when player has 3 pieces in random mode
             if (randomMode) {
-                const otherPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                const otherPlayerMoves = moveHistory.filter(m => m.player === otherPlayer);
-                if (otherPlayerMoves.length >= 3 && !markedForRemoval[otherPlayer]) {
-                    markedForRemoval[otherPlayer] = otherPlayerMoves[Math.floor(Math.random() * otherPlayerMoves.length)];
+                const otherPlayer = currentPlayers[face] === 'X' ? 'O' : 'X';
+                const otherPlayerMoves = moveHistories[face].filter(m => m.player === otherPlayer);
+                if (otherPlayerMoves.length >= 3 && !markedForRemovals[face][otherPlayer]) {
+                    markedForRemovals[face][otherPlayer] = otherPlayerMoves[Math.floor(Math.random() * otherPlayerMoves.length)];
                 }
             }
 
-            if (checkForWin(currentPlayer)) {
-                status.textContent = `🎉 Player ${currentPlayer} wins! 🎉`;
-                gameActive = false;
-                resetBtn.style.background = '#ccffcc';
+            if (checkForWin(face, currentPlayers[face])) {
+                faceStatus[face] = true;
+                faceWins[face] = currentPlayers[face];
+                wonFaces.add(face);
+                console.log(`FACE WON! ${face} won by ${currentPlayers[face]}`);
             } else {
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                status.textContent = `Player ${currentPlayer}'s turn`;
+                currentPlayers[face] = currentPlayers[face] === 'X' ? 'O' : 'X';
+                console.log(`Next player on ${face}: ${currentPlayers[face]}`);
             }
 
-            updateBoard();
+            moveCount++;
+            console.log(`MoveCount increased to: ${moveCount}`);
+            updateBoard(face);
+            updateStatus();
+
+            if (isCubeMode && (moveCount >= 2 || faceStatus[currentFace])) {
+                console.log(`TRIGGERING ROTATION - MoveCount:${moveCount}, CurrentFaceWon:${faceStatus[currentFace]}`);
+                boardLocked = true;
+                console.log(`Board LOCKED at ${Date.now()}`);
+                
+                setTimeout(() => {
+                    console.log(`TIMEOUT EXECUTING at ${Date.now()}`);
+                    const availableFaces = Object.keys(faceStatus).filter(f => f !== currentFace && !faceStatus[f]);
+                    console.log(`Available faces for rotation:`, availableFaces);
+                    
+                    if (availableFaces.length > 0) {
+                        const oldFace = currentFace;
+                        currentFace = availableFaces[Math.floor(Math.random() * availableFaces.length)];
+                        cube.className = `cube cube1 cube-rotate-${currentFace}`;
+                        console.log(`ROTATED from ${oldFace} to ${currentFace}`);
+                    } else {
+                        console.log(`NO ROTATION - No available faces`);
+                    }
+                    
+                    moveCount = 0;
+                    boardLocked = false;
+                    console.log(`MoveCount reset to 0, Board UNLOCKED at ${Date.now()}`);
+                }, 1000);
+            }
         }
 
-        function checkForWin(player) {
+        function checkForWin(face, player) {
             const lines = [
                 [[0,0],[0,1],[0,2]], [[1,0],[1,1],[1,2]], [[2,0],[2,1],[2,2]],
                 [[0,0],[1,0],[2,0]], [[0,1],[1,1],[2,1]], [[0,2],[1,2],[2,2]],
@@ -195,14 +702,15 @@
 
             for (const line of lines) {
                 const [a, b, c] = line;
-                if (board[a[0]][a[1]] === player && 
-                    board[b[0]][b[1]] === player && 
-                    board[c[0]][c[1]] === player) {
+                if (boards[face][a[0]][a[1]] === player && 
+                    boards[face][b[0]][b[1]] === player && 
+                    boards[face][c[0]][c[1]] === player) {
                     [a, b, c].forEach(([row, col]) => {
                         const cellIndex = row * 3 + col;
-                        cells[cellIndex].style.background = '#ffd700';
-                        cells[cellIndex].style.boxShadow = '0 0 10px #ffd700';
-                        cells[cellIndex].style.opacity = '0.7';
+                        const cellsToHighlight = isCubeMode ? allCells[face] : flatCells;
+                        cellsToHighlight[cellIndex].style.background = '#ffd700';
+                        cellsToHighlight[cellIndex].style.boxShadow = '0 0 10px #ffd700';
+                        cellsToHighlight[cellIndex].style.opacity = '0.7';
                     });
                     return true;
                 }
@@ -210,14 +718,16 @@
             return false;
         }
 
-        function updateBoard() {
-            cells.forEach((cell, i) => {
+        function updateBoard(face) {
+            const cellsToUpdate = isCubeMode ? allCells[face] : flatCells;
+            
+            cellsToUpdate.forEach((cell, i) => {
                 const row = Math.floor(i / 3);
                 const col = i % 3;
-                const player = board[row][col];
+                const player = boards[face][row][col];
                 cell.textContent = player || '';
                 
-                if (cell.style.background !== 'rgb(255, 215, 0)') {
+                if (cell.style.background !== 'rgb(255, 249, 196)') {
                     if (player === 'X') {
                         cell.style.background = randomMode ? '#ccffcc' : '#cce7ff';
                         cell.style.color = randomMode ? '#006600' : '#003d7a';
@@ -230,67 +740,150 @@
                     }
                 }
                 
-                if (gameActive) {
+                if (!faceStatus[face]) {
                     const isMarkedForRemoval = randomMode && 
-                        markedForRemoval[player] && 
-                        markedForRemoval[player].row === row && 
-                        markedForRemoval[player].col === col;
+                        markedForRemovals[face][player] && 
+                        markedForRemovals[face][player].row === row && 
+                        markedForRemovals[face][player].col === col;
                     
                     const isOldest = !randomMode && player && 
-                        moveHistory.filter(m => m.player === player).length >= 3 &&
-                        moveHistory.filter(m => m.player === player)[0].row === row &&
-                        moveHistory.filter(m => m.player === player)[0].col === col;
+                        moveHistories[face].filter(m => m.player === player).length >= 3 &&
+                        moveHistories[face].filter(m => m.player === player)[0].row === row &&
+                        moveHistories[face].filter(m => m.player === player)[0].col === col;
                     
-                    cell.style.opacity = (isMarkedForRemoval || isOldest) ? '0.4' : '1';
-                } else {
-                    cell.style.opacity = '1';
+                    if (isMarkedForRemoval || isOldest) {
+                        if (player === 'X') {
+                            cell.style.background = '#f0f8ff';
+                            cell.style.color = '#b0c4de';
+                        } else if (player === 'O') {
+                            cell.style.background = '#fff0f5';
+                            cell.style.color = '#dda0dd';
+                        }
+                    }
                 }
             });
         }
 
-        function resetGame() {
-            board = [[null, null, null], [null, null, null], [null, null, null]];
-            moveHistory = [];
-            currentPlayer = 'X';
-            gameActive = true;
-            markedForRemoval = { X: null, O: null };
-            status.textContent = "Player X's turn";
-            resetBtn.style.background = '#ffcccc';
+        function updateStatus() {
+            if (!isCubeMode) {
+                // Flat mode - check for win and show reset option
+                if (faceStatus['front']) {
+                    const winner = faceWins['front'];
+                    status.textContent = `🎉 Player ${winner} wins! 🎉`;
+                    resetBtn.style.background = '#ccffcc';
+                } else {
+                    const nextPlayer = currentPlayers['front'] || 'X';
+                    status.textContent = `Player ${nextPlayer}'s turn`;
+                    resetBtn.style.background = '#ffcccc';
+                }
+                return;
+            }
             
-            cells.forEach(cell => {
+            const wonFacesCount = Object.values(faceStatus).filter(won => won).length;
+            
+            if (wonFacesCount === faces.length) {
+                const xWins = faces.filter(face => faceWins[face] === 'X').length;
+                const oWins = faces.filter(face => faceWins[face] === 'O').length;
+                
+                const winner = xWins > oWins ? 'X' : oWins > xWins ? 'O' : 'Tie';
+                status.textContent = winner === 'Tie' ? 
+                    `🎉 It's a tie! X:${xWins} O:${oWins} 🎉` : 
+                    `🎉 Player ${winner} wins! X:${xWins} O:${oWins} 🎉`;
+                resetBtn.style.background = '#ccffcc';
+            } else {
+                const nextPlayer = currentPlayers[currentFace] || 'X';
+                status.innerHTML = `${currentFace.toUpperCase()}<br>Player ${nextPlayer}'s turn`;
+            }
+        }
+
+        function resetGame() {
+            faces.forEach(face => {
+                boards[face] = [[null, null, null], [null, null, null], [null, null, null]];
+                moveHistories[face] = [];
+                currentPlayers[face] = 'X';
+                faceStatus[face] = false;
+                faceWins[face] = null;
+                markedForRemovals[face] = { X: null, O: null };
+                
+                allCells[face].forEach(cell => {
+                    cell.style.background = '#f9f9f9';
+                    cell.style.boxShadow = 'none';
+                    cell.style.opacity = '1';
+                });
+                
+                updateBoard(face);
+            });
+            
+            // Reset flat board cells
+            flatCells.forEach(cell => {
                 cell.style.background = '#f9f9f9';
                 cell.style.boxShadow = 'none';
                 cell.style.opacity = '1';
             });
             
-            updateBoard();
+            wonFaces.clear();
+            currentFace = 'front';
+            moveCount = 0;
+            boardLocked = false;
+            gameStarted = false;
+            movesThisRound = 0;
+            cube.className = 'cube cube1 cube-rotate-front';
+            status.textContent = isCubeMode ? "Game reset - Click on front face to start" : "Player X's turn";
+            resetBtn.style.background = '#ffcccc';
         }
 
         resetBtn.addEventListener('click', resetGame);
         toggleBtn.addEventListener('click', () => {
             randomMode = !randomMode;
             toggleBtn.textContent = randomMode ? 'Mode: Random' : 'Mode: Oldest';
-            markedForRemoval = { X: null, O: null };
             
-            // Mark pieces for removal in random mode
-            if (randomMode) {
-                ['X', 'O'].forEach(player => {
-                    const playerMoves = moveHistory.filter(m => m.player === player);
-                    if (playerMoves.length >= 3) {
-                        markedForRemoval[player] = playerMoves[Math.floor(Math.random() * playerMoves.length)];
-                    }
-                });
-            }
-            
-            updateBoard();
+            faces.forEach(face => {
+                // Don't reset won faces - keep them excluded
+                if (faceStatus[face]) return;
+                
+                markedForRemovals[face] = { X: null, O: null };
+                
+                if (randomMode) {
+                    ['X', 'O'].forEach(player => {
+                        const playerMoves = moveHistories[face].filter(m => m.player === player);
+                        if (playerMoves.length >= 3) {
+                            markedForRemovals[face][player] = playerMoves[Math.floor(Math.random() * playerMoves.length)];
+                        }
+                    });
+                }
+                
+                updateBoard(face);
+            });
         });
+
+        gameModeBtn.addEventListener('click', () => {
+            isCubeMode = !isCubeMode;
+            gameModeBtn.textContent = isCubeMode ? 'Mode: Cube' : 'Mode: Flat';
+            
+            if (isCubeMode) {
+                cubeContainer.style.display = 'block';
+                flatBoard.style.display = 'none';
+            } else {
+                cubeContainer.style.display = 'none';
+                flatBoard.style.display = 'grid';
+                currentFace = 'front';
+            }
+            resetGame();
+        });
+
         infoIcon.addEventListener('click', () => {
             showInfo = !showInfo;
             infoIcon.textContent = showInfo ? '❌' : 'ℹ';
             infoPanel.style.display = showInfo ? 'block' : 'none';
-            boardElement.style.display = showInfo ? 'none' : 'grid';
+            faces.forEach(face => {
+                document.querySelector(`#board_${face}`).style.display = showInfo ? 'none' : 'grid';
+            });
         });
-        updateBoard();
+
+        // Initialize
+        cube.className = 'cube cube1 cube-rotate-front';
+        faces.forEach(face => updateBoard(face));
+        updateStatus();
     </script>
 </body>
 </html>
